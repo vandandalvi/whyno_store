@@ -21,6 +21,7 @@ const config: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   images: {
+    unoptimized: true,
     remotePatterns: storageHost ? [{ protocol: "https", hostname: storageHost }] : [],
   },
   experimental: { serverActions: { bodySizeLimit: "1mb" } },
