@@ -1,0 +1,12 @@
+# Local development database only. Never used in production.
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: whyno
+      POSTGRES_PASSWORD: whyno_local_only
+      POSTGRES_DB: whyno
+    ports: ["54329:5432"]
+    volumes: ["whyno_pg:/var/lib/postgresql/data"]
+volumes:
+  whyno_pg:

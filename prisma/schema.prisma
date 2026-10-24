@@ -1,0 +1,236 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AdminRole {
+  OWNER
+  STAFF
+}
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  MOCK_DEMO
+}
+
+// MOCK_CONFIRMED is a demo payment. VERIFIED is reserved for a real gateway
+// and is never set by the admin UI.
+enum PaymentStatus {
+  MOCK_CONFIRMED
+  VERIFIED
+  REFUNDED
+}
+
+enum MovementReason {
+  ORDER_PLACED
+  ORDER_CANCELLED
+  ADMIN_ADJUSTMENT
+  INITIAL
+}
+
+model AdminUser {
+  id           String         @id @default(cuid())
+  email        String         @unique
+  name         String         @default("")
+  passwordHash String
+  role         AdminRole      @default(OWNER)
+  active       Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  sessions     AdminSession[]
+  audits       AuditEvent[]
+}
+
+model AdminSession {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  userId    String
+  user      AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  key       String
+  success   Boolean
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+}
+
+model RateLimitHit {
+  id        String   @id @default(cuid())
+  bucket    String
+  createdAt DateTime @default(now())
+
+  @@index([bucket, createdAt])
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  sortOrder Int       @default(0)
+  createdAt DateTime  @default(now())
+  products  Product[]
+}
+
+model Product {
+  id               String          @id @default(cuid())
+  name             String
+  slug             String          @unique
+  shortDescription String          @default("")
+  description      String          @default("")
+  pricePaise       Int
+  compareAtPaise   Int?
+  sku              String?         @unique
+  categoryId       String?
+  category         Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  specifications   Json            @default("[]")
+  stock            Int             @default(0)
+  status           ProductStatus   @default(DRAFT)
+  weightGrams      Int?
+  shippingNote     String          @default("")
+  seoTitle         String          @default("")
+  seoDescription   String          @default("")
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  images           ProductImage[]
+  orderItems       OrderItem[]
+  movements        InventoryMovement[]
+
+  @@index([status, createdAt])
+  @@index([categoryId])
+}
+
+model ProductImage {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url         String
+  objectKey   String
+  alt         String   @default("")
+  width       Int?
+  height      Int?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([productId, sortOrder])
+}
+
+model Order {
+  id               String        @id @default(cuid())
+  reference        String        @unique
+  idempotencyKey   String        @unique
+  accessTokenHash  String
+  customerName     String
+  customerEmail    String
+  customerPhone    String
+  shipLine1        String
+  shipLine2        String        @default("")
+  shipCity         String
+  shipState        String
+  shipPostalCode   String
+  shipCountry      String        @default("IN")
+  deliveryNotes    String        @default("")
+  subtotalPaise    Int
+  shippingPaise    Int           @default(0)
+  discountPaise    Int           @default(0)
+  totalPaise       Int
+  currency         String        @default("INR")
+  paymentMethod    PaymentMethod @default(MOCK_DEMO)
+  paymentStatus    PaymentStatus @default(MOCK_CONFIRMED)
+  status           OrderStatus   @default(PENDING)
+  trackingReference String       @default("")
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  items            OrderItem[]
+  payments         PaymentAttempt[]
+  movements        InventoryMovement[]
+
+  @@index([createdAt])
+  @@index([status])
+  @@index([customerEmail])
+}
+
+model OrderItem {
+  id             String   @id @default(cuid())
+  orderId        String
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId      String?
+  product        Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  nameSnapshot   String
+  skuSnapshot    String?
+  imageSnapshot  String?
+  unitPricePaise Int
+  quantity       Int
+  linePaise      Int
+
+  @@index([orderId])
+}
+
+model PaymentAttempt {
+  id          String        @id @default(cuid())
+  orderId     String
+  order       Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  method      PaymentMethod
+  status      PaymentStatus
+  amountPaise Int
+  isMock      Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+
+  @@index([orderId])
+}
+
+model InventoryMovement {
+  id        String         @id @default(cuid())
+  productId String
+  product   Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderId   String?
+  order     Order?         @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  delta     Int
+  reason    MovementReason
+  createdAt DateTime       @default(now())
+
+  @@index([productId, createdAt])
+}
+
+model StoreSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+model AuditEvent {
+  id        String     @id @default(cuid())
+  actorId   String?
+  actor     AdminUser? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action    String
+  entity    String
+  entityId  String?
+  summary   String     @default("")
+  createdAt DateTime   @default(now())
+
+  @@index([createdAt])
+}

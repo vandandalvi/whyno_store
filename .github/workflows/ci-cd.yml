@@ -1,0 +1,114 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  test:
+    name: Lint, Typecheck & Integration Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: whyno
+          POSTGRES_PASSWORD: whyno_test_only
+          POSTGRES_DB: whyno_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run TypeScript typecheck
+        run: npm run typecheck
+
+      - name: Run Test Suite (Real PostgreSQL)
+        env:
+          TEST_DATABASE_URL: postgresql://whyno:whyno_test_only@localhost:5432/whyno_test
+          DATABASE_URL: postgresql://whyno:whyno_test_only@localhost:5432/whyno_test
+        run: npm test
+
+      - name: Verify Build
+        env:
+          DATABASE_URL: postgresql://whyno:whyno_test_only@localhost:5432/whyno_test
+        run: npm run build
+
+  deploy:
+    name: Deploy to Azure App Service
+    needs: test
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Azure Login via OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Run Database Migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: npx prisma migrate deploy
+
+      - name: Build Standalone Application
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NODE_ENV: production
+        run: npm run build
+
+      - name: Package Standalone Artifacts
+        run: |
+          mkdir -p deploy-pkg
+          cp -r .next/standalone/* deploy-pkg/
+          mkdir -p deploy-pkg/.next/static
+          cp -r .next/static deploy-pkg/.next/
+          cp -r public deploy-pkg/
+          cd deploy-pkg
+          zip -r ../store-release.zip .
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_WEBAPP_NAME || 'app-whynostore' }}
+          package: store-release.zip
