@@ -100,7 +100,7 @@ export function ImageUploader({ images, onChange }: { images: Img[]; onChange: (
               </div>
               <div className="space-y-2 p-3">
                 <label className="sr-only" htmlFor={`alt-${i}`}>Describe photo {i + 1}</label>
-                <input id={`alt-${i}`} className="input !min-h-[40px] !text-sm" placeholder="Describe the photo" maxLength={160} value={img.alt} onChange={(e) => onChange(images.map((x, n) => (n === i ? { ...x, alt: e.target.value } : x)))} />
+                <input id={`alt-${i}`} className="input !min-h-[44px]" placeholder="Describe the photo" maxLength={160} value={img.alt} onChange={(e) => onChange(images.map((x, n) => (n === i ? { ...x, alt: e.target.value } : x)))} />
                 <div className="flex justify-between">
                   <button type="button" className="btn-ghost !min-h-[40px] !px-3" onClick={() => move(i, -1)} disabled={i === 0} aria-label={`Move photo ${i + 1} earlier`}><ArrowLeft className="h-4 w-4" /></button>
                   <button type="button" className="btn-ghost !min-h-[40px] !px-3" onClick={() => move(i, 1)} disabled={i === images.length - 1} aria-label={`Move photo ${i + 1} later`}><ArrowRight className="h-4 w-4" /></button>

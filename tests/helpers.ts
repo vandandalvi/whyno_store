@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 
 export async function resetDb() {
   await db.$executeRawUnsafe(
-    `TRUNCATE "OrderItem","PaymentAttempt","InventoryMovement","Order","ProductImage","Product","Category","AdminSession","AdminUser","LoginAttempt","RateLimitHit","StoreSetting","AuditEvent" RESTART IDENTITY CASCADE`,
+    `TRUNCATE "OrderItem","PaymentAttempt","InventoryMovement","Order","ProductImage","Product","Category","AdminSession","AdminUser","LoginAttempt","RateLimitHit","StoreSetting","AuditEvent","Customer","CustomerSession" RESTART IDENTITY CASCADE`,
   );
 }
 

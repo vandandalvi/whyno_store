@@ -1,3 +1,4 @@
+import { getCustomer } from "@/lib/customer-auth";
 import { CheckoutError, placeOrder } from "@/lib/orders";
 import { fail, json, readJson, sameOrigin } from "@/lib/http";
 import { allow, clientIp } from "@/lib/ratelimit";
@@ -15,7 +16,8 @@ export async function POST(req: Request) {
     return fail("Please check the highlighted details.", 422, { fields });
   }
   try {
-    const placed = await placeOrder(parsed.data);
+    const customer = await getCustomer();
+    const placed = await placeOrder(parsed.data, customer?.id);
     return json({ reference: placed.reference, token: placed.token, duplicate: placed.duplicate }, placed.duplicate ? 200 : 201);
   } catch (e) {
     if (e instanceof CheckoutError) return fail(e.message, 409, { code: e.code });

@@ -79,7 +79,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   return (
     <CartContext.Provider value={value}>
       {children}
-      <div aria-live="polite" role="status" className="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex justify-center px-4">
+      <div aria-live="polite" role="status" className="pointer-events-none fixed inset-x-0 bottom-[max(1.5rem,env(safe-area-inset-bottom))] z-50 flex justify-center px-4">
         {toast && <div className="rise rounded-full bg-ink px-5 py-3 text-sm font-medium text-white shadow-lift">{toast}</div>}
       </div>
     </CartContext.Provider>

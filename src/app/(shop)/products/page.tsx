@@ -37,18 +37,18 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       <h1 className="text-4xl font-bold sm:text-5xl">Shop</h1>
 
       <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <ul className="flex flex-wrap gap-2" aria-label="Categories">
+        <ul className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&>li]:shrink-0" aria-label="Categories">
           <li><Link href={qs({ category: undefined, page: undefined })} aria-current={!sp.category ? "page" : undefined} className={`btn min-h-[44px] ${!sp.category ? "bg-ink text-white" : "border border-line bg-white hover:bg-sand"}`}>All</Link></li>
           {categories.map((c) => (
             <li key={c.id}><Link href={qs({ category: c.slug, page: undefined })} aria-current={sp.category === c.slug ? "page" : undefined} className={`btn min-h-[44px] ${sp.category === c.slug ? "bg-ink text-white" : "border border-line bg-white hover:bg-sand"}`}>{c.name}</Link></li>
           ))}
         </ul>
-        <form action="/products" className="flex gap-2" role="search">
+        <form action="/products" className="flex flex-wrap gap-2" role="search">
           {sp.category && <input type="hidden" name="category" value={sp.category} />}
           <label htmlFor="q" className="sr-only">Search products</label>
-          <input id="q" name="q" defaultValue={q} type="search" placeholder="Search products" className="input !w-56" />
+          <input id="q" name="q" defaultValue={q} type="search" placeholder="Search products" className="input min-w-0 flex-1 basis-full sm:basis-56 sm:flex-none" />
           <label htmlFor="sort" className="sr-only">Sort by</label>
-          <select id="sort" name="sort" defaultValue={sort} className="input !w-auto">
+          <select id="sort" name="sort" defaultValue={sort} className="input min-w-0 flex-1 sm:w-auto sm:flex-none">
             {SORTS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
           </select>
           <button className="btn-ghost">Apply</button>

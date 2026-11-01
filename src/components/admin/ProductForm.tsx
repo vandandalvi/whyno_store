@@ -95,7 +95,7 @@ export function ProductForm({ initial, categories }: { initial: ProductFormValue
   const compareP = v.compareAt.trim() ? rupeesToPaise(v.compareAt) : null;
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); save(); }} className="grid gap-8 xl:grid-cols-[1fr_340px]">
+    <form onSubmit={(e) => { e.preventDefault(); save(); }} className="grid gap-8 pb-28 xl:grid-cols-[1fr_340px] xl:pb-0">
       <div className="space-y-8">
         {banner && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 font-medium text-red-800">{banner}</div>}
 
@@ -158,10 +158,10 @@ export function ProductForm({ initial, categories }: { initial: ProductFormValue
         <Section title="Details" hint="For example: Material — Bamboo, Colour — Natural.">
           <ul className="space-y-3">
             {v.specifications.map((r, i) => (
-              <li key={i} className="grid grid-cols-[1fr_1fr_auto] items-start gap-3">
+              <li key={i} className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-xl border border-line p-3 sm:grid-cols-[1fr_1fr_auto] sm:border-0 sm:p-0">
                 <div><label className="sr-only" htmlFor={`k${i}`}>Detail name {i + 1}</label><input id={`k${i}`} className="input" placeholder="e.g. Material" maxLength={60} value={r.key} onChange={(e) => set("specifications", v.specifications.map((x, n) => (n === i ? { ...x, key: e.target.value } : x)))} /></div>
                 <div><label className="sr-only" htmlFor={`v${i}`}>Detail value {i + 1}</label><input id={`v${i}`} className="input" placeholder="e.g. Bamboo" maxLength={300} value={r.value} onChange={(e) => set("specifications", v.specifications.map((x, n) => (n === i ? { ...x, value: e.target.value } : x)))} /></div>
-                <button type="button" className="btn-ghost !min-h-[48px] !px-3" aria-label={`Remove detail ${i + 1}`} onClick={() => set("specifications", v.specifications.filter((_, n) => n !== i))}><Trash2 className="h-4 w-4" /></button>
+                <button type="button" className="btn-ghost row-span-2 !min-h-[48px] !px-3 sm:row-span-1" aria-label={`Remove detail ${i + 1}`} onClick={() => set("specifications", v.specifications.filter((_, n) => n !== i))}><Trash2 className="h-4 w-4" /></button>
               </li>
             ))}
           </ul>
@@ -217,6 +217,11 @@ export function ProductForm({ initial, categories }: { initial: ProductFormValue
           <button type="button" className="btn-danger w-full" onClick={() => setConfirmDelete(true)}><Trash2 className="h-4 w-4" />Remove this product</button>
         )}
       </aside>
+
+      <div className="fixed inset-x-0 bottom-0 z-30 flex gap-3 border-t border-line bg-white/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur xl:hidden">
+        <button type="button" className="btn-ghost" onClick={() => { if (!dirty || confirm("Leave without saving your changes?")) router.push("/admin/products"); }}>Cancel</button>
+        <button className="btn-primary flex-1" disabled={pending}>{pending ? "Saving…" : "Save product"}</button>
+      </div>
 
       <ConfirmDialog
         open={confirmDelete}

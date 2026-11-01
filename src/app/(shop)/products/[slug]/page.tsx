@@ -52,9 +52,9 @@ export default async function ProductPage({ params }: Props) {
   return (
     <div className="container-x py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
-      <nav aria-label="Breadcrumb" className="mb-6 text-sm text-mute">
-        <Link href="/products" className="hover:text-ink">Shop</Link>
-        {p.category && <> / <Link href={`/products?category=${p.category.slug}`} className="hover:text-ink">{p.category.name}</Link></>}
+      <nav aria-label="Breadcrumb" className="mb-4 flex flex-wrap items-center gap-x-1 text-sm text-mute">
+        <Link href="/products" className="tap hover:text-ink">Shop</Link>
+        {p.category && <> / <Link href={`/products?category=${p.category.slug}`} className="tap hover:text-ink">{p.category.name}</Link></>}
       </nav>
       <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
         <Gallery images={p.images.map((i) => ({ url: i.url, alt: i.alt || p.name }))} name={p.name} />

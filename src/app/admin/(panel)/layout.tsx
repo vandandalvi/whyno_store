@@ -23,7 +23,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
           ))}
         </nav>
         <div className="flex items-center gap-3 text-sm text-mute">
-          <Link href="/" target="_blank" className="underline underline-offset-4 hover:text-ink">View shop</Link>
+          <Link href="/" target="_blank" className="tap underline underline-offset-4 hover:text-ink">View shop</Link>
           <span className="hidden sm:inline">{admin.email}</span>
           <form action={logoutAction}><button className="btn-ghost min-h-[44px] px-4">Sign out</button></form>
         </div>

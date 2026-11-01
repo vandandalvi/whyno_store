@@ -31,7 +31,7 @@ export default async function OrderDetail({ params }: { params: Promise<{ id: st
       ) : (
         <ol className="grid grid-cols-4 gap-2" aria-label="Order progress">
           {STEPS.map((s, i) => (
-            <li key={s} className={`rounded-xl px-3 py-3 text-center text-sm font-medium ${i <= idx ? "bg-lime text-lime-ink" : "bg-sand text-mute"}`} aria-current={i === idx ? "step" : undefined}>{ORDER_LABEL(s)}</li>
+            <li key={s} className={`rounded-xl px-1 py-3 text-center text-[11px] font-medium leading-tight sm:px-3 sm:text-sm ${i <= idx ? "bg-lime text-lime-ink" : "bg-sand text-mute"}`} aria-current={i === idx ? "step" : undefined}>{ORDER_LABEL(s)}</li>
           ))}
         </ol>
       )}

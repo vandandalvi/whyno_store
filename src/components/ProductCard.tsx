@@ -42,7 +42,7 @@ export function ProductCard({ p, lowStock = 5 }: { p: Card; lowStock?: number })
   const sold = p.stock <= 0;
   return (
     <Link href={`/products/${p.slug}`} className="group block">
-      <div className="card relative aspect-[4/5] overflow-hidden transition duration-300 ease-out group-hover:-translate-y-1 group-hover:shadow-lift">
+      <div className="card relative aspect-[4/5] overflow-hidden bg-sand transition duration-300 ease-out group-hover:-translate-y-1 group-hover:shadow-lift">
         <div className="absolute inset-0 transition duration-500 ease-out group-hover:scale-[1.03]">
           <ProductImage src={p.images[0]?.url} alt={p.images[0]?.alt || p.name} sizes="(min-width:1024px) 25vw, (min-width:640px) 33vw, 50vw" />
         </div>
@@ -50,6 +50,7 @@ export function ProductCard({ p, lowStock = 5 }: { p: Card; lowStock?: number })
         {!sold && p.stock <= lowStock && <span className="badge absolute left-3 top-3 bg-white text-ink shadow-card">Only {p.stock} left</span>}
       </div>
       <div className="px-1 pt-4">
+        <span className="sr-only">View product: </span>
         {p.category && <p className="text-xs font-medium uppercase tracking-wider text-mute">{p.category.name}</p>}
         <h3 className="mt-1 font-sans text-[17px] font-medium leading-snug">{p.name}</h3>
         <Price price={p.pricePaise} compareAt={p.compareAtPaise} className="mt-1 text-[15px]" />

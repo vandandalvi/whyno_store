@@ -30,16 +30,16 @@ export default function CartPage() {
               <Link href={`/products/${l.slug}`} className="card relative h-28 w-24 shrink-0 overflow-hidden sm:h-32 sm:w-28">
                 {l.image ? <Image src={l.image} alt={l.name} fill sizes="112px" className="object-cover" /> : <div className="h-full bg-sand" />}
               </Link>
-              <div className="flex flex-1 flex-col justify-between">
-                <div className="flex justify-between gap-3">
-                  <div>
-                    <Link href={`/products/${l.slug}`} className="font-medium hover:underline">{l.name}</Link>
+              <div className="flex min-w-0 flex-1 flex-col justify-between gap-2">
+                <div className="flex flex-wrap justify-between gap-x-3 gap-y-1">
+                  <div className="min-w-0">
+                    <Link href={`/products/${l.slug}`} className="break-words font-medium hover:underline">{l.name}</Link>
                     <p className="text-sm text-mute">{formatMoney(l.unitPricePaise, c)} each</p>
                     {l.quantity === 0 && <p className="mt-1 text-sm font-medium text-red-700">Sold out — remove to continue</p>}
                   </div>
                   <p className="font-semibold tabular-nums">{formatMoney(l.linePaise, c)}</p>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center rounded-full border border-line bg-white" role="group" aria-label={`Quantity for ${l.name}`}>
                     <button className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-sand" aria-label="Decrease quantity" onClick={() => setQuantity(l.productId, l.quantity - 1)}><Minus className="h-4 w-4" /></button>
                     <span className="w-8 text-center tabular-nums">{l.quantity}</span>

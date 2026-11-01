@@ -21,7 +21,7 @@ export type PlacedOrder = { reference: string; token: string | null; duplicate: 
  * Stock is decremented with a conditional UPDATE, so concurrent buyers can't oversell.
  * The idempotency key makes retries / double-clicks return the same order.
  */
-export async function placeOrder(input: CheckoutInput): Promise<PlacedOrder> {
+export async function placeOrder(input: CheckoutInput, customerId?: string | null): Promise<PlacedOrder> {
   const existing = await db.order.findUnique({ where: { idempotencyKey: input.idempotencyKey } });
   if (existing) return { reference: existing.reference, token: null, duplicate: true };
 
@@ -67,6 +67,7 @@ export async function placeOrder(input: CheckoutInput): Promise<PlacedOrder> {
           reference: newReference(),
           idempotencyKey: input.idempotencyKey,
           accessTokenHash: sha256(token),
+          customerId: customerId ?? null,
           customerName: input.customer.name,
           customerEmail: input.customer.email.toLowerCase(),
           customerPhone: input.customer.phone,

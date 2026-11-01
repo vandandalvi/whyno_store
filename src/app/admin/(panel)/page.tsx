@@ -43,7 +43,7 @@ export default async function Dashboard() {
         <Stat label="New orders to handle" value={newOrders} href="/admin/orders?status=PENDING" tone={newOrders ? "ring-2 ring-lime-deep" : ""} />
       </div>
       <section aria-labelledby="recent">
-        <div className="mb-4 flex items-center justify-between"><h2 id="recent" className="text-2xl font-semibold">Recent orders</h2><Link href="/admin/orders" className="text-sm underline underline-offset-4">See all</Link></div>
+        <div className="mb-4 flex items-center justify-between"><h2 id="recent" className="text-2xl font-semibold">Recent orders</h2><Link href="/admin/orders" className="tap text-sm underline underline-offset-4">See all</Link></div>
         {recent.length === 0 ? (
           <p className="card p-8 text-center text-mute">No orders yet. They will appear here as soon as someone checks out.</p>
         ) : (

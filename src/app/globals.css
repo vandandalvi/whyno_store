@@ -25,6 +25,7 @@
   .field-error { @apply mt-1 text-sm font-medium text-red-700; }
   .card { @apply rounded-xl2 bg-white shadow-card; }
   .badge { @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold; }
+  .tap { @apply inline-flex min-h-[44px] items-center; }
   .container-x { @apply mx-auto w-full max-w-7xl px-5 sm:px-8; }
 }
 

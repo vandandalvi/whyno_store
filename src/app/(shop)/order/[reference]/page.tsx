@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { findOrderForCustomer } from "@/lib/orders";
+import { getCustomer } from "@/lib/customer-auth";
+import { db } from "@/lib/db";
 import { formatMoney } from "@/lib/money";
 
 export const metadata: Metadata = { title: "Order confirmation", robots: { index: false } };
@@ -13,7 +15,11 @@ const STATUS: Record<string, string> = {
 export default async function OrderPage({ params, searchParams }: { params: Promise<{ reference: string }>; searchParams: Promise<{ t?: string }> }) {
   const { reference } = await params;
   const { t } = await searchParams;
-  const order = await findOrderForCustomer(reference, t ?? "");
+  let order = await findOrderForCustomer(reference, t ?? "");
+  if (!order) {
+    const me = await getCustomer();
+    if (me) order = await db.order.findFirst({ where: { reference, customerId: me.id }, include: { items: true } });
+  }
 
   if (!order) {
     // Without the private link we show only the reference — never order details.

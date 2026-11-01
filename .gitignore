@@ -8,3 +8,5 @@ public/uploads
 *.tsbuildinfo
 next-env.d.ts
 coverage
+mobile-shots*
+.deploy-stage

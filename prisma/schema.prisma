@@ -87,6 +87,34 @@ model RateLimitHit {
   @@index([bucket, createdAt])
 }
 
+// Shoppers who signed in with the same Whyno (Firebase, project whyno-2026) Google account
+// used by the keyboard app and browser extension. Guest checkout still works without one.
+model Customer {
+  id          String            @id @default(cuid())
+  firebaseUid String            @unique
+  email       String
+  name        String            @default("")
+  photoUrl    String            @default("")
+  createdAt   DateTime          @default(now())
+  lastLoginAt DateTime          @default(now())
+  sessions    CustomerSession[]
+  orders      Order[]
+
+  @@index([email])
+}
+
+model CustomerSession {
+  id         String   @id @default(cuid())
+  tokenHash  String   @unique
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  @@index([customerId])
+  @@index([expiresAt])
+}
+
 model Category {
   id        String    @id @default(cuid())
   name      String
@@ -144,6 +172,8 @@ model Order {
   reference        String        @unique
   idempotencyKey   String        @unique
   accessTokenHash  String
+  customerId       String?
+  customer         Customer?     @relation(fields: [customerId], references: [id], onDelete: SetNull)
   customerName     String
   customerEmail    String
   customerPhone    String
@@ -172,6 +202,7 @@ model Order {
   @@index([createdAt])
   @@index([status])
   @@index([customerEmail])
+  @@index([customerId])
 }
 
 model OrderItem {
